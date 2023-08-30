@@ -1,0 +1,131 @@
+<%- include("_header") -%>
+<div id="left-pannel">
+    <div class = "options">
+        <form autocomplete = "off">
+            <div class="input_button">
+                <input type="text" id="input-map" placeholder = "Rechercher parmi les 3056 communes retenues..." name="search" >
+                <input type="submit" name ="envoi" value="OK">
+            </div>
+            <ul class="list"></ul>
+        </form>
+        <div id="affiche-centre">
+            <input type="checkbox" name="centres" id="check-cv">
+            <label for="check-cv">Afficher les périmètres de centres-villes</label>
+        </div>
+    </div>
+    <p id="map-title"></p>
+    <div id="map">
+    </div>
+</div>
+<div id="vertical-line">
+</div>
+<div id="right-pannel">
+    <div id="options-right">
+        <div class="line">
+                <p class="plu">Comparer avec les centres-villes :</p>
+            <div class="param">
+                <div class="check-label">
+                    <input type="checkbox" class="compare" name="type" id="type">
+                    <label for="type">du même type</label>
+                </div>
+                <div class="check-label">
+                    <input type="checkbox" class="compare" name="france" id="france">
+                    <label for="france">de France métropolitaine</label>
+                </div>
+                <div class="check-label">
+                    <input type="checkbox" class="compare" name="region" id="region"autocomplete="off">
+                    <label for="region">de la région</label>
+                </div>
+                <div class="check-label">
+                    <input type="checkbox" class="compare" name="departement" id="departement">
+                    <label for="departement">du département</label>
+                </div>
+            </div>
+        </div>
+        <div class="line">
+            <p class="sin"> Comparer avec un autre centre-ville : </p>
+            <form autocomplete = "off" id = 'compare-form'>
+                <div class="input_button">
+                    <input type="text" id="compare" placeholder = "Rechercher parmi les 3056 communes retenues..." name="search">
+                    <input type="submit" name ="envoi" value="OK" id = "ok_compare">
+                </div>
+                <ul class="list-compare"></ul>
+            </form>
+        </div>
+    </div>
+    <div id="dashboard">
+        <div class="tabs">
+            <button class="tab-button active" onclick="openTab(event, 'sl')">Se loger</button>
+            <button class="tab-button" onclick="openTab(event, 'aec')">S'approvisionner</button>
+            <button class="tab-button" onclick="openTab(event, 'sdi')">Se divertir</button>
+            <button class="tab-button" onclick="openTab(event, 'sda')">Se déplacer, accéder</button>
+            <button class="tab-button" onclick="openTab(event, 'es')">Prendre soin</button>
+            <button class="tab-button" onclick="openTab(event, 'ti')">Travailler, innover</button>
+        </div>
+
+        <div id="sl" class="tab-content active">
+            <div class="chart-containers-container">
+                <div class="chart-container sl1">
+                    <canvas id="chart_sl1"></canvas>
+                </div>
+                <div class="chart-container sl34">
+                    <canvas id="chart_sl34"></canvas>
+                </div>
+                <div class="chart-container slmen">
+                    <canvas id="chart_slmen"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="aec" class="tab-content">
+            <div class="chart-containers-container">
+                <div class="chart-container">
+                    <canvas id="chart_aec"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="sdi" class="tab-content">
+            <div class="chart-containers-container">
+                <div class="chart-container">
+                    <canvas id="chart_sdi"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="sda" class="tab-content">
+            <div class="chart-containers-container">
+                <div class="chart-container sda1">
+                    <canvas id="chart_sda1"></canvas>
+                </div>
+                <div class="chart-container sda2">
+                    <canvas id="chart_sda2"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="es" class="tab-content">
+            <div class="chart-containers-container">
+                <div class="chart-container es1">
+                    <canvas id="chart_es1"></canvas>
+                </div>
+                <div class="chart-container es2">
+                    <canvas id="chart_es2"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div id="ti" class="tab-content">
+            <div class="chart-containers-container">
+                <div class="chart-container ti13">
+                    <canvas id="chart_ti13"></canvas>
+                </div>
+                <div class="chart-container ti4">
+                    <canvas id="chart_ti4"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script defer src="js/script.js"></script>
+<script defer src="js/script2.js"></script>
