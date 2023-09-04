@@ -22,9 +22,9 @@ const type_graph = {
     'aec': 'radar',
     'sdi': 'radar',
     'sda1': 'bar',
-    'sda2': 'doughnut',
+    'sda2': 'bar',
     'es1': 'bar',
-    'es2': 'doughnut',
+    'es2': 'bar',
     'ti13': 'bar',
     'ti4': 'bar'
 };
@@ -69,11 +69,6 @@ const options_graph = {
             }
         }
     }
-}
-
-const label_complementaire = {
-    'sda2':'Part des voies non cyclables',
-    'es2': 'Part des espaces verts publics au-delà du rayon de 500m',
 }
 
 const nom_indicateurs = {
@@ -149,13 +144,6 @@ function create_graph(json, search, is_submitted, chart_id, thematique){
     }
     else {
         bg_col = [`rgba(${hexToRgb(bd_col[0])}, 0.8)`];
-    }
-    if (type === 'doughnut'){
-        data.push(100-data[0]);
-        bg_col.push('rgba(204,204,204,1)');
-        labels.push(label_complementaire[thematique]);
-        bd_col = 'rgba(255,255,255,1)';
-        borderWidth = 1;
     }
     if (thematique === 'slmen'){
         indexAxis = 'y';

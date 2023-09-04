@@ -9,7 +9,7 @@ var max_bounds = L.latLngBounds(
 );
 
 var form = document.querySelector('form');
-var is_first = true; // is it the first geolocation fetch ?
+var is_first = true; // Initialisation sur true, changement dès qu'on fait appel à l'api pour la géolocalisation
 var layer_group;
 var check_cv = document.getElementById("check-cv");
 var cv_group;
