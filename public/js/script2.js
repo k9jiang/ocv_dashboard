@@ -1,6 +1,7 @@
 let input_compare = document.getElementById('compare');
 let list_compare = document.querySelector('.list-compare');
 let form_compare = document.getElementById('compare-form');
+const dl = document.getElementById('dl-link');
 const indicateurs = {
     'sl1' : ['sl1a', 'sl1b', 'sl1c'],
     'sl34' : ['sl3', 'sl4'],
@@ -93,6 +94,11 @@ const nom_indicateurs = {
     'ti3' : 'Part des immeubles raccordés à la fibre',
     'ti4' : 'Nombre de tiers-lieux'
 };
+
+dl.addEventListener('click', (e) =>{
+    e.preventDefault();
+    window.location.href='/dl-data';
+})
 
 input_compare.addEventListener("keyup", (e) => {
     items = document.querySelectorAll(".list-item-compare");

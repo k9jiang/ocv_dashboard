@@ -71,3 +71,6 @@ app.get("/perimetre_ocv", (req, res) => {
 app.get("/perimetre_commune", (req, res) => {
   res.json(perimetre_commune);
 });
+app.get("/dl-data", (req, res) => {
+  res.download('public/export_data/indicateurs_ocv.xlsx');
+})
