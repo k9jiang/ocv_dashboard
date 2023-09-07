@@ -80,21 +80,21 @@ input[type="submit"]:hover {
 }
 .line{
     display: flex;
-    justify-content: space-between;
+    justify-content: start;
     align-items: center;
 }
 
 .line .plu {
-    width: 40%;
+    width: 31%;
     margin-bottom:0px;
 }
 
 .line .sin {
-    width: 40%;
+    width: 30%;
     margin: 0px;
 }
 .line form {
-    width:61%;
+    width: 40%;
     margin-right:20px;
     margin-bottom: -20px;
     padding-bottom: 30px;
@@ -105,6 +105,7 @@ input[type="submit"]:hover {
     justify-content: space-between;
     margin-right: 20px;
     margin-bottom: 0px;
+    margin-top: 15px;
 }
 
 .check-label{
@@ -279,11 +280,6 @@ ul{
   display: block;
 }
 
-/*.chart-container{
-    position: static;
-    height: 650px;
-}*/
-
 .chart-containers-container{
     display: grid;
     grid-template-columns: repeat(10, 1fr);
@@ -326,4 +322,18 @@ ul{
 .chart-container.ti4{
     grid-column: 8/11;
     grid-row: 1/11;
+}
+
+.err-text{
+    color: red;
+    display: none;
+    font-size: 12px;
+}
+
+.err-text.left{
+    margin-left: 15px;
+}
+
+.err-text.right{
+    margin-left: -20px;
 }

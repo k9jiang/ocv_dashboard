@@ -316,14 +316,22 @@ function refreshDataSets(e, json, search, chart_id) {
     }
     // Si non, (comparaison avec une commune)
     else if (e.type === 'submit' && e.target.tagName === 'FORM') {
-        let datasetIndexToRemove = chart.data.datasets.findIndex(dataset => dataset.class == 'single');
-        //Si l'index n'existe pas il sera égal à -1, alors s'il est >0, on supprime le dataset précédent
-        if (datasetIndexToRemove > 0) {
-            chart.data.datasets.splice(datasetIndexToRemove, 1);
-            chart.update();}
-        //On ajoute au chart le dataset obtenu
-        let data_label = getLabelAndData(form_compare.elements["search"].value, json, feature);
-        pushDataSet(data_label, chart, thematique);
+        e.preventDefault();
+        let name = form_compare.elements["search"].value;
+        if (!villes.includes(name)){
+            errtxt[1].style.display = 'block';
+        }
+        else{
+            errtxt[1].style.display = 'none';
+            let datasetIndexToRemove = chart.data.datasets.findIndex(dataset => dataset.class == 'single');
+            //Si l'index n'existe pas il sera égal à -1, alors s'il est >0, on supprime le dataset précédent
+            if (datasetIndexToRemove > 0) {
+                chart.data.datasets.splice(datasetIndexToRemove, 1);
+                chart.update();}
+            //On ajoute au chart le dataset obtenu
+            let data_label = getLabelAndData(form_compare.elements["search"].value, json, feature);
+            pushDataSet(data_label, chart, thematique);
+        }
     }
 }
 
@@ -344,36 +352,39 @@ fetch('http://localhost:3000/data')
         }
         //Utiliser de la fonction geolocalisation pour zoomer sur la commune et récuperer le code insee
         search = geolocalisation(e);
+        console.log(search);
         //Mettre à jour le titre de la carte
-        updateMapTitle(search, data_json);
-        //Création des graphiques
-        let chart_sdi = create_graph(data_json, search, is_submitted, 'chart_sdi', 'sdi');
-        let chart_aec = create_graph(data_json, search, is_submitted, 'chart_aec', 'aec');
-        let chart_sl1 = create_graph(data_json, search, is_submitted, 'chart_sl1', 'sl1');
-        let chart_sl34 = create_graph(data_json, search, is_submitted, 'chart_sl34', 'sl34');
-        let chart_slmen = create_graph(data_json, search, is_submitted, 'chart_slmen', 'slmen');
-        let chart_sda1 = create_graph(data_json, search, is_submitted, 'chart_sda1', 'sda1');
-        let chart_sda2 = create_graph(data_json, search, is_submitted, 'chart_sda2', 'sda2');
-        let chart_es1 = create_graph(data_json, search, is_submitted, 'chart_es1', 'es1');
-        let chart_es2 = create_graph(data_json, search, is_submitted, 'chart_es2', 'es2');
-        let chart_ti13 = create_graph(data_json, search, is_submitted, 'chart_ti13', 'ti13');
-        let chart_ti4 = create_graph(data_json, search, is_submitted, 'chart_ti4', 'ti4');
-        is_submitted = true;
-        for (let i = 0; i< checkboxes.length; i++){
-            if (checkboxes[i].checked) {
-                let feature = json.filter(obj => obj.codgeo == search);
-                label_data = getLabelAndData(checkboxes[i].name, json, feature);
-                pushDataSet(label_data, chart_sdi, 'sdi');
-                pushDataSet(label_data, chart_aec, 'aec');
-                pushDataSet(label_data, chart_sl1, 'sl1');
-                pushDataSet(label_data, chart_sl34, 'sl34');
-                pushDataSet(label_data, chart_sda1, 'sda1');
-                pushDataSet(label_data, chart_sda2, 'sda2');
-                pushDataSet(label_data, chart_es1, 'es1');
-                pushDataSet(label_data, chart_es2, 'es2');
-                pushDataSet(label_data, chart_ti13, 'ti13');
-                pushDataSet(label_data, chart_slmen, 'slmen');
-                pushDataSet(label_data, chart_ti4, 'ti4');
+        if (search != 'monsieur gros caca'){
+            updateMapTitle(search, data_json);
+            //Création des graphiques
+            let chart_sdi = create_graph(data_json, search, is_submitted, 'chart_sdi', 'sdi');
+            let chart_aec = create_graph(data_json, search, is_submitted, 'chart_aec', 'aec');
+            let chart_sl1 = create_graph(data_json, search, is_submitted, 'chart_sl1', 'sl1');
+            let chart_sl34 = create_graph(data_json, search, is_submitted, 'chart_sl34', 'sl34');
+            let chart_slmen = create_graph(data_json, search, is_submitted, 'chart_slmen', 'slmen');
+            let chart_sda1 = create_graph(data_json, search, is_submitted, 'chart_sda1', 'sda1');
+            let chart_sda2 = create_graph(data_json, search, is_submitted, 'chart_sda2', 'sda2');
+            let chart_es1 = create_graph(data_json, search, is_submitted, 'chart_es1', 'es1');
+            let chart_es2 = create_graph(data_json, search, is_submitted, 'chart_es2', 'es2');
+            let chart_ti13 = create_graph(data_json, search, is_submitted, 'chart_ti13', 'ti13');
+            let chart_ti4 = create_graph(data_json, search, is_submitted, 'chart_ti4', 'ti4');
+            is_submitted = true;
+            for (let i = 0; i< checkboxes.length; i++){
+                if (checkboxes[i].checked) {
+                    let feature = json.filter(obj => obj.codgeo == search);
+                    label_data = getLabelAndData(checkboxes[i].name, json, feature);
+                    pushDataSet(label_data, chart_sdi, 'sdi');
+                    pushDataSet(label_data, chart_aec, 'aec');
+                    pushDataSet(label_data, chart_sl1, 'sl1');
+                    pushDataSet(label_data, chart_sl34, 'sl34');
+                    pushDataSet(label_data, chart_sda1, 'sda1');
+                    pushDataSet(label_data, chart_sda2, 'sda2');
+                    pushDataSet(label_data, chart_es1, 'es1');
+                    pushDataSet(label_data, chart_es2, 'es2');
+                    pushDataSet(label_data, chart_ti13, 'ti13');
+                    pushDataSet(label_data, chart_slmen, 'slmen');
+                    pushDataSet(label_data, chart_ti4, 'ti4');
+                }
             }
         }
     });

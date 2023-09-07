@@ -2,6 +2,7 @@ let input = document.getElementById('input-map');
 let list = document.querySelector('.list');
 let items;
 var map = L.map('map').setView([46.855, 2.15], 6);
+const errtxt = document.querySelectorAll('.err-text');
 
 var max_bounds = L.latLngBounds(
     L.latLng(41.294317, -5.27348), // top-left corner
@@ -114,16 +115,23 @@ function set_border(){
 function geolocalisation(event){
     event.preventDefault();
     var search = form.elements["search"].value;
-    var link = 'http://api-adresse.data.gouv.fr/search/?q='+search;
-    if (is_first){
-        get_fetch_location(link);
-        is_first = false;
+    if (!villes.includes(search)){
+        errtxt[0].style.display = 'block';
+        return 'monsieur gros caca'
     }
-    else {
-        layer_group.clearLayers(); //Réinitialise le layergroup s'il s'agit de la deuxième requête de géolocalisation
-        get_fetch_location(link);
+    else{
+        errtxt[0].style.display = 'none';
+        var link = 'http://api-adresse.data.gouv.fr/search/?q='+search;
+        if (is_first){
+            get_fetch_location(link);
+            is_first = false;
+        }
+        else {
+            layer_group.clearLayers(); //Réinitialise le layergroup s'il s'agit de la deuxième requête de géolocalisation
+            get_fetch_location(link);
+        }
+        return search.substring(search.length -6, search.length-1)
     }
-    return search.substring(search.length -6, search.length-1)
 }
 
 function get_fetch_location(link){
