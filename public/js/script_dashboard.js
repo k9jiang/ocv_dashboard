@@ -33,41 +33,18 @@ const type_graph = {
 const options_graph = {
     'sl1':{
         r: {
-            max: 100,
-            min: 0,
-            ticks: {
-                stepSize: 20
-            }
-        }
-    },
-    'sl34':{
-        y:{
-            max: 50,
             min: 0,
         }
     },
-    'slmen':{
-        x:{
-            max: 100,
-            min: 0,
-        }
-    },
+
     'aec':{
         r: {
-            max: 1,
             min: 0,
-            ticks: {
-                stepSize: 0.2
-            }
         }
     },
     'sdi': {
         r: {
-            max: 5,
             min: 0,
-            ticks: {
-                stepSize: 1
-            }
         }
     }
 }
@@ -264,7 +241,6 @@ function pushDataSet(data_label, chart, thematique){
     let label = data_label[1];
     let bd_col = data_label[2];
     let bg_col;
-    let borderWidth = 3;
     let classtype = data_label[3];
     let variables = indicateurs[thematique].map((indicateur) => calculateMedian(data, indicateur));
     if (type_graph[thematique] === 'radar'){

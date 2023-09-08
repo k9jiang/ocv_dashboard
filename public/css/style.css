@@ -156,7 +156,7 @@ ul{
 
 #vertical-line{
     border-left: 1px solid black;
-    height : 850px;
+    height : 885px;
 }
 
 #right-pannel {
@@ -286,6 +286,32 @@ ul{
     grid-template-rows: repeat(10, 1fr);
     height: 650px;
 }
+
+.info-button{
+    grid-column: 10/11;
+    grid-row: 1/2;
+    height: 20px;
+    width: 20px;
+    align-self: start;
+    justify-self: end;
+    position: absolute;
+}
+
+.info-button:hover{
+    cursor: pointer;
+}
+
+.tooltip{
+    display: none;
+    margin: 20px 45px 0px 20px;
+    grid-column: 1/11;
+    grid-row: 1/11;
+    position: absolute;
+    border: 1px solid black;
+    padding: 0px 10px;
+    background-color: white;
+}
+
 .chart-container{
     grid-column: 1/11;
     grid-row: 1/11;
@@ -294,6 +320,7 @@ ul{
 .chart-container.sl1{
     grid-column: 1/7;
     grid-row: 1/7;
+    align-self: end;
 }
 
 .chart-container.sl34{
@@ -336,4 +363,33 @@ ul{
 
 .err-text.right{
     margin-left: -20px;
+}
+
+@keyframes fade-in {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.tooltip.fade-in{
+    display: block;
+    animation: fade-in 0.4s ease-in-out;
+    opacity: 1;
+}
+.tooltip.fade-out{
+    display: block;
+    animation: fade-out 0.3s ease-in-out;
+    opacity: 0;
 }

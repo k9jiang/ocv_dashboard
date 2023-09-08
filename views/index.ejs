@@ -66,6 +66,25 @@
         </div>
         <div id="sl" class="tab-content active">
             <div class="chart-containers-container">
+                <img class= 'info-button' src="img/info.png">
+                <div class="tooltip">
+                    <p>
+                        <b>Les ménages en situation de pauvreté</b> sont ceux dont le revenu disponible 
+                        par unité de consommation (ou niveau de vie) est inférieur au seuil de pauvreté. 
+                        En 2017, année de référence de données utilisées, celui-ci était de 1 041€ par mois. 
+                        Leur nombre est ramené au nombre total de ménages, issu de la même source de données. 
+                        Le fait de mesurer la pauvreté à l’échelle du ménage et pas de l’individu (comme 
+                        dans le cas du taux de pauvreté) induit un biais potentiel, celui de la différence 
+                        de taille moyenne des ménages touchés par la pauvreté. Est ici mesurée la fréquence 
+                        des situations de pauvreté parmi les ménages et pas au sein de la population dans 
+                        son ensemble.
+                        <br><br>
+                        <b>La part des logements de moins de 10 ans</b> parmi le nombre total de logement nous renseigne 
+                        sur la dynamique de construction. A été comptabilisé le nombre de logements dont la date 
+                        de construction est égale ou supérieure à 2011 ramené au nombre total de logements 
+                        dans le millésime 2020 des Fichiers Foncier du Cerema.
+                    </p>
+                </div>
                 <div class="chart-container sl1">
                     <canvas id="chart_sl1"></canvas>
                 </div>
@@ -80,6 +99,32 @@
 
         <div id="aec" class="tab-content">
             <div class="chart-containers-container">
+                <img class= 'info-button' src="img/info.png">
+                <div class="tooltip">
+                    <p>
+                        <b>L’indice de spécificité</b> indique si la composition du tissu commercial d’un centre-ville 
+                        est égale à celle observé en moyenne dans les centres-villes de la même catégorie 
+                        de centralité. Dans ce cas l’indice est égal à 0 (par exemple une ville où 5 % 
+                        des commerces du centre-ville sont des boulangeries, comme le sont en moyenne 
+                        les commerces des centres-villes des centralités de même catégorie, et cette égalité 
+                        est valable pour tous les types de commerces), il tend vers 1 dans le cas contraire. 
+                        Le calcul de l’indice repose sur le nombre de commerces du centre-ville qui devraient 
+                        changer d’activité pour atteindre cette égalité, rapporté au nombre total de commerces 
+                        du centre-ville.
+                        <br><br>
+                        <b>L’indice de spécialisation</b> indique si la composition du tissu commercial 
+                        d’un centre ville est égale à celle du tissu commercial du reste de la commune. 
+                        Dans ce cas l’indice est égal à 0 (ex. dans une commune où 30% des commerces sont situés 
+                        en centre-ville, la part de chaque type de commerce en centre-ville est de 30%), 
+                        il tend vers 1 dans le cas contraire. Le calcul de l’indice repose sur le nombre 
+                        de commerces qui devraient changer d’activité pour atteindre cette égalité, 
+                        rapporté au nombre total de commerces.<br><br>
+                        <i>A noter que la donnée provient de la Base Permanente des Equipements (BPE) 
+                            de l’Insee de 2020. 40 équipements commerciaux ont été choisis parmi 
+                            une liste pour réaliser l'analyse. </i>
+
+                    </p>
+                </div>
                 <div class="chart-container">
                     <canvas id="chart_aec"></canvas>
                 </div>
@@ -88,6 +133,36 @@
 
         <div id="sdi" class="tab-content">
             <div class="chart-containers-container">
+                <img class= 'info-button' src="img/info.png">
+                <div class="tooltip">
+                    <p>
+                        <b>L’offre culturelle du centre-ville</b> 
+                        est appréciée à l’aide d’un indicateur composite s’appuyant sur :<br>
+                        • Le taux d’équipement en cinéma, conservatoire dispensant un enseignement initial de musique, de danse et/ou d’art dramatique, 
+                        ensemble de structures culturelles (théâtres, centres nationaux des arts de la rue et de l’espace public, pôles nationaux du cirque) 
+                        gérées par ARTCENA (alliance du Centre national du théâtre et de HorsLesMurs consacré au cirque et aux arts de la rue), 
+                        bibliothèque (médiathèque, bibliothèque, point lecture, dépôt lecture…) relevant des collectivités territoriales, 
+                        l’ensemble des structures culturelles dédiées à la musique et à la danse (centres chorégraphiques nationaux, centres de développement 
+                        chorégraphiques nationaux, centres nationaux de création musicale, opéras nationaux en région, orchestres nationaux en région, scènes 
+                        de musiques actuelles, zénith) sur le centre-ville pour 1 000 habitants. L’indicateur est calculé par le ratio du nombre d’établissements 
+                        <i>(SOURCE : FICHIER BPE 2020 GÉOLOCALISÉ ET À JOUR, CODES F303, F305, F306, F307, F308, F309) </i>
+                        sur le nombre d’habitants <i>(SOURCE : INSEE, DONNÉES CARROYÉES, 2017)</i>.<br>
+                        En multipliant ce ratio par 1 000, on en déduit la densité d’établissements pour 1000 habitants. Le même taux est calculé pour la périphérie.<br>
+                        • Le ratio entre le taux d’équipement du centre et celui de la périphérie. Ce ratio permet d’identifier si le niveau d’équipement est plutôt favorable
+                        au centre-ville ou à sa périphérie.<br>
+                        • L’indice de concentration équipements culturels. Cet indice est calculé en faisant le rapport entre le nombre d’établissement en centre-ville et le nombre
+                        d’établissement en périphérie.<br>
+                        Chaque élément est noté de 1 à 5 en fonction de la dispersion de l’ensemble de l’échantillon et l’indicateur est la moyenne de ces trois notes. Une note élevée reflète une forte concentration de l’offre sur le centre-ville plutôt que sa périphérie, avec une offre pour 1000 habitants sur le centre-ville
+                        parmi les plus fortes du panel et plus élevée que sur la périphérie.<br><br>
+                        <b>La convivialité du centre-ville</b> ainsi que <b>l'offre de loisirs du centre-ville</b> sont obtenus de la même manière à partir 
+                        d'autres établisements :<br>
+                        • La convivialité sur les bars et restaurants <i>(SOURCE : FICHIER SIRENE GÉOLOCALISÉ ET À JOUR)</i><br>
+                        • Les loisirs sur les bassins de natation, boulodromes, tennis, vélodromes, domaines skiables, centres équestres, stades d’athlétismes, terrains de golf,
+                        parcours sportif/santé, aires de sports de glace, plateaux et terrains de jeux extérieurs, salles spécialisées (basket-ball, handball, etc.), terrains de grand
+                        jeux (football, rugby, etc.), salles de combat, salles non spécialisées (salle polyvalente, des fêtes), roller-skate-vélo bicross ou free-style, sports nautiques,
+                        bowlings, salles de remise en forme, salle multisports (gymnases) <i>(SOURCE : FICHIER BPE 2020 GÉOLOCALISÉ ET À JOUR, CODES 101 À F121)</i>
+                    </p>
+                </div>
                 <div class="chart-container">
                     <canvas id="chart_sdi"></canvas>
                 </div>
@@ -96,6 +171,24 @@
 
         <div id="sda" class="tab-content">
             <div class="chart-containers-container">
+                <img class= 'info-button' src="img/info.png">
+                <div class="tooltip">
+                    <p>
+                        Pour chacun des centres-villes étudiés, un isochrone de 15 minutes à pied via le réseau a été calculé. 
+                        <b>L’indicateur sur l’accessibilité piétonne du centre-ville</b> se calcule par le rapport entre le nombre 
+                        d’habitants contenu dans un rayon de 15 minutes à pied autour du centre-ville et 
+                        la population de la commune observée.
+                        <br><br>
+                        Un réseau cyclable regroupe plusieurs catégories de voies : les pistes cyclables en site propre 
+                        exclusivement réservées à la pratique cycliste, les bandes cyclables où une partie de la chaussée 
+                        est réservée aux cyclistes avec une simple délimitation par un marquage au sol, et les double-sens 
+                        (ou contresens) cyclables qui sont des voies à sens unique et limitées à 30 km/h pour les véhicules 
+                        motorisés sur lesquelles les cyclistes sont autorisés à circuler dans les deux sens. Est observé ici 
+                        le degré de cyclabilité, soit la <b>part du réseau cyclable dans chaque centre-ville</b>. Ce taux est calculé 
+                        en divisant la longueur du réseau cyclable par la longueur de l’ensemble de la voirie (exceptés les 
+                        autoroutes et les voies rapides). Cet indicateur ne prend donc pas en compte la qualité des infrastructures. 
+                    </p>
+                </div>
                 <div class="chart-container sda1">
                     <canvas id="chart_sda1"></canvas>
                 </div>
@@ -107,6 +200,27 @@
 
         <div id="es" class="tab-content">
             <div class="chart-containers-container">
+                <img class= 'info-button' src="img/info.png">
+                <div class="tooltip">
+                    <p>
+                        L’offre de soins regroupe l’ensemble des professionnels de santé, libéraux ou salariés
+                        et concerne entre autres les médecins généralistes qui constituent l’offre de soins de premier recours. 
+                        Est observé ici la <b>densité de médecins généralistes</b>, soit le ratio du nombre de médecins généralistes 
+                        pour 10 000 habitants (le choix a été fait de prendre ce ratio afin de s’adapter à la population des 
+                        centres-villes qui est très rarement supérieure à 100 000 habitants, soit le ratio standard pour 
+                        apprécier la densité médicale).
+                        <br><br>
+                        Sont considérés comme espaces verts : les parcs, les jardins et les espaces forestiers issus de la base OpenStreetMap. 
+                        A ensuite été calculé la <b>part d’espaces verts situés dans le centre-ville et dans un rayon de 500 mètres autour de 
+                        ce dernier</b> en faisant le ratio entre la surface d’espaces verts et la superficie totale de la zone couvrant le 
+                        centre-ville et les 500 mètres autour de ce dernier. A été décidé de prendre un rayon de 500 mètres car, à la différence 
+                        des équipements qui ont été pris en compte pour réaliser les périmètres de centres-villes, les espaces verts ne rentrent 
+                        pas dans cette catégorie et il était donc intéressant d’élargir un peu le périmètre du centre afin d’intégrer les espaces 
+                        verts à proximité immédiate. <br>
+                        <i>À noter : OpenStreet map est open source, librement modifiable et faite par des internautes. 
+                        Il ne s’agit donc pas d’un recensement exhaustif des espaces verts. </i>
+                    </p>
+                </div>
                 <div class="chart-container es1">
                     <canvas id="chart_es1"></canvas>
                 </div>
@@ -118,6 +232,30 @@
 
         <div id="ti" class="tab-content">
             <div class="chart-containers-container">
+                <img class= 'info-button' src="img/info.png">
+                <div class="tooltip">
+                    <p>
+                        <b>La mixité fonctionnelle du centre-ville</b> est appréciée à l’aide du ratio relatif activité/habitat. 
+                        À défaut de données d’emplois robustes et ouvertes à l’échelle des centres-villes, l’indicateur est calculé par le ratio
+                        du volume d’établissements <i>(SOURCE : FICHIER SIRENE GÉOLOCALISÉ ET À JOUR)</i> sur le volume de logements 
+                        <i>(SOURCE : INSEE, DONNÉES CARROYÉES, 2017)</i>. En multipliant ce ratio par 100, on en déduit la densité d’établissements pour 100 logements.<br>
+                        <i>À noter que le fichier Sirene a été nettoyé en retirant les sociétés civiles immobilières (SCI) et formes juridiques assimilées 
+                        ainsi que les codes d’activités 6820A (Location de logements) et 6820B (Location de terrains et d’autres biens immobiliers).</i>
+                        <br><br>
+                        <b>Le taux de connectivité</b> est ici défini comme la part, parmi les immeubles éligibles à la fibre optique, 
+                        des immeubles dans lesquels la fibre optique a été déployée. Il est calculé à partir de la base de données trimestrielle 
+                        de déploiement de la fibre optique à l’ARCEP à la maille infra-communale à l’immeuble. Le millésime exploité 
+                        est le premier trimestre 2022.
+                        <br><br>
+                        <b>L’indicateur de nombre de tiers-lieux</b> est issu du recensement national 2020 réalisé par 
+                        l’association France Tiers-Lieux. La base de données compile les recensements existants identifiés 
+                        <i>(recensement du CGET de 2018, cartographie de PiNG, cartographie de la Compagnie des tiers-lieux, etc.)</i> 
+                        auxquels s’ajoute un recensement par questionnaire réalisé par l’association. Au total, ce sont 2 300 tiers-lieux 
+                        qui ont été recensés en France. Toutefois, leur nombre est en constante progression et est estimé par 
+                        France Tiers-Lieux entre 3 000 et 3 500 à fin 2022. Pour information, le panel des centralités étudiées accueille 
+                        80% des tiers-lieux des 2 300 tiers-lieux recensés dans la base de données. 
+                    </p>
+                </div>
                 <div class="chart-container ti13">
                     <canvas id="chart_ti13"></canvas>
                 </div>
@@ -126,7 +264,10 @@
                 </div>
             </div>
         </div>
+        <a href="/dl-data" id="dl-link">Télécharger les données</a>
     </div>
 </div>
-<script defer src="js/script.js"></script>
-<script defer src="js/script2.js"></script>
+</div>
+<script defer src="js/script_webmapping.js"></script>
+<script defer src="js/script_dashboard.js"></script>
+<script defer src="js/script_tooltips.js"></script>
