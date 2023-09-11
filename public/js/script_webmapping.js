@@ -2,6 +2,7 @@ let input = document.getElementById('input-map');
 let list = document.querySelector('.list');
 let items;
 var map = L.map('map').setView([46.855, 2.15], 6);
+let profil_age;
 const errtxt = document.querySelectorAll('.err-text');
 
 var max_bounds = L.latLngBounds(
@@ -117,7 +118,7 @@ function geolocalisation(event){
     var search = form.elements["search"].value;
     if (!villes.includes(search)){
         errtxt[0].style.display = 'block';
-        return 'monsieur gros caca'
+        return 'non'
     }
     else{
         errtxt[0].style.display = 'none';
@@ -265,11 +266,14 @@ function checkCheckboxLimits(e) {
   }
 }
 
-function updateMapTitle(commune, data){
+function updateMapTitleAndAgeProfile(commune, data){
     map_title = document.getElementById('map-title');
     //réinitialiser le titre de la carte
     map_title.textContent = '';
     //récupérer l'array d'information de la commune avec le json en filtrant par le code insee
     let data_commune = data.filter(obj => obj.codgeo == commune);
     map_title.innerHTML = `<b>${data_commune[0].nom_com}</b>, ${type_cv[data_commune[0].categ_cent]}`;
+    sl_age = document.getElementById('profil-age');
+    sl_age.textContent = '';
+    sl_age.innerHTML = `<b>Profil lié à l'âge</b> : ${types_profil_age[data_commune[0].sl_age]}`;
 }

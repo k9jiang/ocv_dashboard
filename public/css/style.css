@@ -323,6 +323,12 @@ ul{
     align-self: end;
 }
 
+#profil-age{
+    grid-column: 1/7;
+    grid-row : 1/2;
+    align-self: start;
+}
+
 .chart-container.sl34{
     grid-column: 7/11;
     grid-row : 1/7;

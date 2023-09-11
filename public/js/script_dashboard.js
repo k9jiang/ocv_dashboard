@@ -2,6 +2,7 @@ let input_compare = document.getElementById('compare');
 let list_compare = document.querySelector('.list-compare');
 let form_compare = document.getElementById('compare-form');
 const dl = document.getElementById('dl-link');
+
 const indicateurs = {
     'sl1' : ['sl1a', 'sl1b', 'sl1c'],
     'sl34' : ['sl3', 'sl4'],
@@ -15,6 +16,14 @@ const indicateurs = {
     'ti13' : ['ti1', 'ti3'],
     'ti4': ['ti4'],
 };
+
+const types_profil_age = {
+    1: 'Centres-villes très faiblement peuplés, très fortes proportions de personnes âgées',
+    2: 'Centres-villes faiblement peuplés, fortes proportions de personnes âgées',
+    3: "Centres-villes faiblement peuplés, fortes proportions de 40-54 ans et proportions assez fortes d'enfants et d'adolescents",
+    4: "Centres-villes assez peuplés, fortes proportions de jeunes adultes et de trentenaires",
+    5: "Centres-villes fortement peuplés, fortes proportions d'enfants et d'adolescents, fortes proportions de 25-39 ans"
+}
 
 const type_graph = {
     'sl1': 'radar',
@@ -50,25 +59,25 @@ const options_graph = {
 }
 
 const nom_indicateurs = {
-    'sl1a' : ['Part des petits', 'logements (T1-T2)'],
-    'sl1b' : ['Part des propriétaires occupants'],
-    'sl1c' : ['Part des logements locatifs sociaux'],
-    'sl3' : ['Part des logements construits', 'entre 2010 et 2020'],
-    'sl4' : ['Part des logements vacants', 'depuis plus de 2 ans'],
-    'sl_menpauv': 'Part des ménages à bas revenus',
-    'sl_menseul': "Part des ménages d'une personne",
+    'sl1a' : ['Part des petits', 'logements (T1-T2) (%)'],
+    'sl1b' : ['Part des propriétaires occupants (%)'],
+    'sl1c' : ['Part des logements locatifs sociaux (%)'],
+    'sl3' : ['Part des logements construits', 'entre 2010 et 2020 (%)'],
+    'sl4' : ['Part des logements vacants', 'depuis plus de 2 ans (%)'],
+    'sl_menpauv': 'Part des ménages à bas revenus (%)',
+    'sl_menseul': "Part des ménages d'une personne (%)",
     'aec1' : 'Indice de concentration commerciale',
     'aec2' : 'Indice de spécialisation commerciale',
     'aec3' : 'Indice de spéficité commerciale',
     'sdi1' : "Indicateur d'offre culturelle",
     'sdi2' : "Indicateur d'offre de convivialité",
     'sdi3' : "Indicateur d'offre de loisirs",
-    'sda1' : 'Accessibilité piétone',
-    'sda2' : 'Part des voies cyclables',
+    'sda1' : 'Accessibilité piétone (%)',
+    'sda2' : 'Part des voies cyclables (%)',
     'es1' : 'Nombre de médecins généralistes pour 10 000 habitants',
-    'es2' : 'Part des espaces verts publics dans un rayon de 500m',
+    'es2' : 'Part des espaces verts publics dans un rayon de 500m (%)',
     'ti1' : 'Mixité fonctionnelle du foncier',
-    'ti3' : 'Part des immeubles raccordés à la fibre',
+    'ti3' : 'Part des immeubles raccordés à la fibre (%)',
     'ti4' : 'Nombre de tiers-lieux'
 };
 
@@ -330,8 +339,8 @@ fetch('http://localhost:3000/data')
         search = geolocalisation(e);
         console.log(search);
         //Mettre à jour le titre de la carte
-        if (search != 'monsieur gros caca'){
-            updateMapTitle(search, data_json);
+        if (search != 'non'){
+            updateMapTitleAndAgeProfile(search, data_json);
             //Création des graphiques
             let chart_sdi = create_graph(data_json, search, is_submitted, 'chart_sdi', 'sdi');
             let chart_aec = create_graph(data_json, search, is_submitted, 'chart_aec', 'aec');
