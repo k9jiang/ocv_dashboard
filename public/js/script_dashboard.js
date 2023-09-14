@@ -60,8 +60,8 @@ const options_graph = {
 
 const nom_indicateurs = {
     'sl1a' : ['Part des petits', 'logements (T1-T2) (%)'],
-    'sl1b' : ['Part des propriétaires occupants (%)'],
-    'sl1c' : ['Part des logements locatifs sociaux (%)'],
+    'sl1b' : ['Part des propriétaires', 'occupants (%)'],
+    'sl1c' : ['Part des logements', 'locatifs sociaux (%)'],
     'sl3' : ['Part des logements construits', 'entre 2010 et 2020 (%)'],
     'sl4' : ['Part des logements vacants', 'depuis plus de 2 ans (%)'],
     'sl_menpauv': 'Part des ménages à bas revenus (%)',
@@ -132,7 +132,7 @@ function create_graph(json, search, is_submitted, chart_id, thematique){
     }
     //Les graphiques en radar ont une opacité réduite pour la superposition
     if (type ==='radar'){
-        bg_col = [`rgba(${hexToRgb(bd_col[0])}, 0.3)`];
+        bg_col = [`rgba(${hexToRgb(bd_col[0])}, 0.15)`];
     }
     else {
         bg_col = [`rgba(${hexToRgb(bd_col[0])}, 0.8)`];
@@ -238,7 +238,7 @@ function getLabelAndData(name, json, feature) {
         codgeo = name.substring(name.length -6, name.length-1)
         data = json.filter(obj => obj.codgeo == codgeo);
         label = name.substring(0, name.length - 8);
-        bg_col = '#FDA1FA';
+        bg_col = '#18F0C8';
         classtype = 'single';
     }
     return [data, label, bg_col, classtype]
