@@ -321,7 +321,7 @@ function refreshDataSets(e, json, search, chart_id) {
 }
 
 //Promesse : fetch sur les données indicateurs de chaque centre ville
-fetch('http://localhost:3000/data')
+fetch('/data')
 .then(function(res){
     return res.json();
 })

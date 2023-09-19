@@ -1,6 +1,6 @@
 var villes =[];
 
-//fetch('http://localhost:3000/villes')
+//fetch('/villes')
 //.then(res => res.json())
 //.then(res2 => {
 //    for (ville of res2) {
@@ -9,7 +9,7 @@ var villes =[];
 //})
 
 
-fetch('http://localhost:3000/villes')
+fetch('/villes')
 .then(res => {
     if (!res.ok) {
         throw new Error('Network response was not ok');

@@ -184,7 +184,7 @@ L.tileLayer('https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/
     attribution: '&copy Map tiles by <a href="https://carto.com/attribution/#basemaps">CartoDB</a>'
 }).addTo(map);
 
-fetch('http://localhost:3000/perimetre_commune')
+fetch('/perimetre_commune')
 .then(res => res.json())
 .then (res2 => {
     contour_commune = L.geoJSON(res2, {
@@ -201,7 +201,7 @@ fetch('http://localhost:3000/perimetre_commune')
 
 //On charge une seule fois les données du geoserver
 //fetch('http://localhost:8080/geoserver/ocv/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=ocv%3Aperimetre_cv_viz_4326&outputFormat=application%2Fjson')
-fetch('http://localhost:3000/perimetre_ocv')
+fetch('/perimetre_ocv')
 .then(res => res.json())
 .then(res2 => {
     check_cv.addEventListener('change', (e) => {
