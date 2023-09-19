@@ -122,7 +122,7 @@ function geolocalisation(event){
     }
     else{
         errtxt[0].style.display = 'none';
-        var link = 'http://api-adresse.data.gouv.fr/search/?q='+search;
+        var link = 'https://api-adresse.data.gouv.fr/search/?q='+search;
         if (is_first){
             get_fetch_location(link);
             is_first = false;
