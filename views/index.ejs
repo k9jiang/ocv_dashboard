@@ -1,8 +1,8 @@
 <%- include("_header") -%>
 <div id="left-pannel">
-    <div class = "options">
+    <div id="options-left">
         <form autocomplete = "off">
-            <div class="input_button">
+            <div class="input-button">
                 <input type="text" id="input-map" placeholder = "Rechercher parmi les 3056 communes retenues..." name="search" >
                 <input type="submit" name ="envoi" value="OK">
             </div>
@@ -13,8 +13,10 @@
             <label for="check-cv">Afficher les périmètres de centres-villes</label>
         </div>
     </div>
-    <p class="err-text left">Veuillez entrer une valeur dans la liste</p>
-    <p id="map-title"></p>
+    <div id="text-container">
+        <p class="err-text left">Veuillez entrer une valeur dans la liste</p>
+        <p id="map-title"></p>
+    </div>
     <div id="map">
     </div>
 </div>
@@ -23,7 +25,7 @@
 <div id="right-pannel">
     <div id="options-right">
         <div class="line">
-                <p class="plu">Comparer avec les centres-villes :</p>
+                <p>Comparer avec les centres-villes :</p>
             <div class="param">
                 <div class="check-label">
                     <input type="checkbox" class="compare" name="type" id="type">
@@ -43,12 +45,12 @@
                 </div>
             </div>
         </div>
-        <div class="line">
-            <p class="sin"> Comparer avec un autre centre-ville : </p>
-            <form autocomplete = "off" id = 'compare-form'>
-                <div class="input_button">
+        <div class="line sin">
+            <p> Comparer avec un autre centre-ville : </p>
+            <form autocomplete = "off" id='compare-form'>
+                <div class="input-button">
                     <input type="text" id="compare" placeholder = "Rechercher parmi les 3056 communes retenues..." name="search">
-                    <input type="submit" name ="envoi" value="OK" id = "ok_compare">
+                    <input type="submit" name ="envoi" value="OK">
                 </div>
                 <ul class="list-compare"></ul>
             </form>
@@ -265,10 +267,11 @@
                 </div>
             </div>
         </div>
-        <a href="/dl-data" id="dl-link">Télécharger les données</a>
     </div>
+    <a href="/dl-data" id="dl-link">Télécharger les données</a>
 </div>
 </div>
+</body>
 <script defer src="js/script_webmapping.js"></script>
 <script defer src="js/script_dashboard.js"></script>
 <script defer src="js/script_tooltips.js"></script>
