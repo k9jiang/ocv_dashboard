@@ -72,5 +72,5 @@ app.get("/perimetre_commune", (req, res) => {
   res.json(perimetre_commune);
 });
 app.get("/dl-data", (req, res) => {
-  res.download('public/export_data/indicateurs_ocv.xlsx');
+  res.download('public/export_data/export_data_centralites.zip');
 })
