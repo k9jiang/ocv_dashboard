@@ -44,7 +44,7 @@ fs.readFile('public/json/commune.geojson', 'utf8', function(err, data){
   perimetre_commune = JSON.parse(data);
 })
 
-fs.readFile('public/json/indicateurs_ocv2.json', 'utf8', function(err, data){
+fs.readFile('public/json/indicateurs_ocv.json', 'utf8', function(err, data){
   if(err) throw err;
   indicateurs_ocv = JSON.parse(data);
   //Filtration pour n'avoir que les communes et leur code insee
