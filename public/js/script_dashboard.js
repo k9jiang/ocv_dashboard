@@ -109,7 +109,7 @@ function isCanvasEmpty(canvas) {
     let context = canvas.getContext('2d');
     let pixelBuffer = new Uint32Array(
     context.getImageData(0, 0, canvas.width, canvas.height).data.buffer);
-    console.log(!pixelBuffer.some(color => color !== 0));
+    //console.log(!pixelBuffer.some(color => color !== 0));
     return !pixelBuffer.some(color => color !== 0);
 }
 
@@ -337,7 +337,6 @@ fetch('/data')
         }
         //Utiliser de la fonction geolocalisation pour zoomer sur la commune et récuperer le code insee
         search = geolocalisation(e);
-        console.log(search);
         //Mettre à jour le titre de la carte
         if (search != 'non'){
             updateMapTitleAndAgeProfile(search, data_json);
