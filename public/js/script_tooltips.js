@@ -42,3 +42,14 @@ for (let i = 0; i < infoButtons.length; i++) {
     infoButtons[i].addEventListener('mouseenter', handleMouseEnter);
     infoButtons[i].addEventListener('mouseleave', handleMouseLeave);
 }
+
+// Do not let a click on a map feature's tooltip trigger a chart-info tooltip.
+document.addEventListener('click', event => {
+    if (event.target.closest('.leaflet-container')) return;
+
+    document.querySelectorAll('.tooltip.fade-in').forEach(tooltip => {
+        tooltip.classList.remove('fade-in');
+        tooltip.classList.add('fade-out');
+    });
+    isDisplayed.fill(false);
+});

@@ -1,6 +1,10 @@
+import * as L from 'leaflet';
+import { maplibreGL } from '@maplibre/maplibre-gl-leaflet';
+
 let input = document.getElementById('input-map');
 let list = document.querySelector('.list');
 let items;
+window.L = L;
 var map = L.map('map').setView([46.855, 2.15], 6);
 let profil_age;
 const errtxt = document.querySelectorAll('.err-text');
@@ -10,9 +14,9 @@ var max_bounds = L.latLngBounds(
     L.latLng(51.124213, 9.887695) // bottom-right corner
 );
 
-var form = document.querySelector('form');
-var is_first = true; // Initialisation sur true, changement dès qu'on fait appel à l'api pour la géolocalisation
-var layer_group;
+var form = document.getElementById('map-search-form');
+let layer_group;
+let locationRequestId = 0;
 var check_cv = document.getElementById("check-cv");
 var cv_group;
 var legend;
@@ -69,7 +73,8 @@ function remove_elements(items){
 function renderCitySuggestions(searchInput, suggestionsList, itemClass) {
     remove_elements(suggestionsList.querySelectorAll('li'));
     const query = searchInput.value.trim();
-    const matches = (query ? villes.filter(ville => is_part_of(query, ville)) : villes).slice(0, 30);
+    const cityNames = window.villes || [];
+    const matches = (query ? cityNames.filter(ville => is_part_of(query, ville)) : cityNames).slice(0, 30);
     matches.forEach(ville => {
         const item = document.createElement('li');
         item.className = itemClass;
@@ -104,11 +109,13 @@ function renderCitySuggestions(searchInput, suggestionsList, itemClass) {
 }
 
 function display_names(value, target){
-    const searchInput = target === 'compare' ? input_compare : input;
-    const suggestionsList = target === 'compare' ? list_compare : list;
+    const isComparison = target === 'compare';
+    const searchInput = document.getElementById(isComparison ? 'compare' : 'input-map');
+    const suggestionsList = document.getElementById(isComparison ? 'list-compare' : 'list-map');
     searchInput.value = value;
     suggestionsList.hidden = true;
     searchInput.setAttribute('aria-expanded', 'false');
+    searchInput.closest('form')?.requestSubmit();
 }
 
 input.addEventListener('input', () => renderCitySuggestions(input, list, 'list-item'));
@@ -121,6 +128,7 @@ input.addEventListener('blur', () => {
     }, 120);
 });
 
+
 function geolocalisation(event){
     event.preventDefault();
     var search = form.elements["search"].value;
@@ -130,29 +138,33 @@ function geolocalisation(event){
     }
     else{
         errtxt[0].style.display = 'none';
-        var link = 'https://api-adresse.data.gouv.fr/search/?q='+search;
-        if (is_first){
-            get_fetch_location(link);
-            is_first = false;
-        }
-        else {
-            layer_group.clearLayers(); //Réinitialise le layergroup s'il s'agit de la deuxième requête de géolocalisation
-            get_fetch_location(link);
-        }
+        const link = 'https://api-adresse.data.gouv.fr/search/?q=' + encodeURIComponent(search);
+        get_fetch_location(link);
         return search.substring(search.length -6, search.length-1)
     }
 }
 
-function get_fetch_location(link){
-    fetch(link)
-    .then(function (result) {
-    return result.json();
-    })
-    .then(function (result2) {
-    layer_group = L.geoJSON(result2.features[0]);
-    var bounds = layer_group.getBounds();
-    map.setView([bounds._northEast.lat, bounds._northEast.lng], 13);
-    })
+async function get_fetch_location(link){
+    const requestId = ++locationRequestId;
+    try {
+        const response = await fetch(link);
+        if (!response.ok) throw new Error('Unable to locate the selected commune');
+        const result = await response.json();
+        const feature = result.features?.[0];
+        if (!feature || requestId !== locationRequestId) return;
+
+        const coordinates = feature.geometry?.coordinates;
+        const longitude = Array.isArray(coordinates) ? Number(coordinates[0]) : NaN;
+        const latitude = Array.isArray(coordinates) ? Number(coordinates[1]) : NaN;
+        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)
+            || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+            throw new Error('The location service returned invalid coordinates');
+        }
+
+        map.setView([latitude, longitude], 13);
+    } catch (error) {
+        console.error('Commune location failed:', error);
+    }
 }
 
 function format_number(num) {
@@ -187,20 +199,26 @@ function createLegend() {
 map.setMaxBounds(max_bounds);
 map.setMinZoom(6);
 
-L.tileLayer('https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.jpg', {
-    maxZoom: 19,
-    attribution: '&copy Map tiles by <a href="https://carto.com/attribution/#basemaps">CartoDB</a>'
-}).addTo(map);
+//L.tileLayer('https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}.jpg', {
+//    maxZoom: 19,
+//    attribution: '&copy Map tiles by <a href="https://carto.com/attribution/#basemaps">CartoDB</a>'
+//}).addTo(map);
 
+maplibreGL({ style: 'https://tiles.openfreemap.org/styles/positron' }).addTo(map);
+
+let contour_commune;
 fetch('/perimetre_commune')
-.then(res => res.json())
-.then (res2 => {
+.then(res => {
+    if (!res.ok) throw new Error('Unable to load commune boundaries');
+    return res.json();
+})
+.then(res2 => {
     contour_commune = L.geoJSON(res2, {
         style : function(feature) {
             return {
                 fillColor : 'transparent',
                 color : 'blue',
-                weight : 0.5,
+                weight : 1,
                 opacity: 1
             }
         }
@@ -224,13 +242,13 @@ fetch('/perimetre_ocv')
                 ${layer.feature.properties.nom_com} (${layer.feature.properties.codgeo}) : ${type_cv[layer.feature.properties.categ_cent]}
                 <br>Population du centre (2017) : ${format_number(layer.feature.properties.pop_cv)}
                 <br>Population totale de la commune (2017) : ${format_number(layer.feature.properties.totpop_com)}`,
-                {sticky: true});
+                {sticky: true, bubblingMouseEvents: false});
             });
             createLegend();
         }
         else {
-            cv_group.removeFrom(map);
-            map.removeControl(legend);
+            if (cv_group) cv_group.removeFrom(map);
+            if (legend && map.hasLayer(legend)) map.removeControl(legend);
         }
     })
 })
@@ -261,9 +279,6 @@ function openTab(evt, tabName) {
     }
   }
 
-// Récupérer toutes les cases à cocher
-var checkboxes = document.querySelectorAll('input[class="compare"]');
-
 // Définir le nombre maximum de cases à cocher activées
 const maxChecked = 2;
 
@@ -283,13 +298,35 @@ function checkCheckboxLimits(e) {
 }
 
 function updateMapTitleAndAgeProfile(commune, data){
-    map_title = document.getElementById('map-title');
-    //réinitialiser le titre de la carte
-    map_title.textContent = '';
-    //récupérer l'array d'information de la commune avec le json en filtrant par le code insee
-    let data_commune = data.filter(obj => obj.codgeo == commune);
-    map_title.innerHTML = `<b>${data_commune[0].nom_com}</b>, ${type_cv[data_commune[0].categ_cent]}`;
-    sl_age = document.getElementById('profil-age');
-    sl_age.textContent = '';
-    sl_age.innerHTML = `<b>Profil lié à l'âge</b> : ${types_profil_age[data_commune[0].sl_age]}`;
+    const mapTitle = document.getElementById('map-title');
+    const communeData = data.find(obj => obj.codgeo == commune);
+    if (!communeData) return;
+
+    mapTitle.textContent = '';
+    mapTitle.innerHTML = `<b>${communeData.nom_com}</b>, ${type_cv[communeData.categ_cent]}`;
+    const ageProfile = document.getElementById('profil-age');
+    ageProfile.textContent = '';
+    ageProfile.innerHTML = `<b>Profil lié à l'âge</b> : ${window.types_profil_age?.[communeData.sl_age] || ''}`;
 }
+
+// This file is an ES module, so explicitly expose the legacy API used by the
+// dashboard script and inline tab handlers.
+Object.assign(window, {
+    map,
+    form,
+    check_cv,
+    errtxt,
+    type_cv,
+    geom_style,
+    checkCheckboxLimits,
+    openTab,
+    geolocalisation,
+    updateMapTitleAndAgeProfile,
+    is_part_of,
+    remove_elements,
+    renderCitySuggestions,
+    display_names,
+});
+
+window.webmappingReady = window.webmappingReady || Promise.resolve();
+window.dispatchEvent(new Event('webmapping-ready'));

@@ -2,6 +2,7 @@ let input_compare = document.getElementById('compare');
 let list_compare = document.querySelector('.list-compare');
 let form_compare = document.getElementById('compare-form');
 const dl = document.getElementById('dl-link');
+const checkboxes = document.querySelectorAll('input.compare');
 
 const indicateurs = {
     'sl1' : ['sl1a', 'sl1b', 'sl1c'],
@@ -23,7 +24,8 @@ const types_profil_age = {
     3: "Centres-villes faiblement peuplés, fortes proportions de 40-54 ans et proportions assez fortes d'enfants et d'adolescents",
     4: "Centres-villes assez peuplés, fortes proportions de jeunes adultes et de trentenaires",
     5: "Centres-villes fortement peuplés, fortes proportions d'enfants et d'adolescents, fortes proportions de 25-39 ans"
-}
+};
+window.types_profil_age = types_profil_age;
 
 const type_graph = {
     'sl1': 'radar',
@@ -86,8 +88,8 @@ dl.addEventListener('click', (e) =>{
     window.location.href='/dl-data';
 })
 
-input_compare.addEventListener('input', () => renderCitySuggestions(input_compare, list_compare, 'list-item-compare'));
-input_compare.addEventListener('focus', () => renderCitySuggestions(input_compare, list_compare, 'list-item-compare'));
+input_compare.addEventListener('input', () => window.renderCitySuggestions(input_compare, list_compare, 'list-item-compare'));
+input_compare.addEventListener('focus', () => window.renderCitySuggestions(input_compare, list_compare, 'list-item-compare'));
 list_compare.addEventListener('mousedown', event => event.preventDefault());
 input_compare.addEventListener('blur', () => {
     window.setTimeout(() => {
@@ -206,8 +208,8 @@ function getLabelAndData(name, json, feature) {
     }
     else if (name == 'type'){
         data = json.filter(obj => obj.categ_cent == feature[0].categ_cent);
-        label = `Médiane des ${getPluralSeparated(type_cv[feature[0].categ_cent])}`;
-        bg_col = geom_style[feature[0].categ_cent].fillColor;
+        label = `Médiane des ${getPluralSeparated(window.type_cv[feature[0].categ_cent])}`;
+        bg_col = window.geom_style[feature[0].categ_cent].fillColor;
     }
     //Tous les autres cas, c-a-d lorsqu'on compare avec un autre centre-ville
     else {
@@ -271,12 +273,12 @@ function refreshDataSets(e, json, search, chart_id) {
         }
     } else if (e.type === 'submit' && e.target.tagName === 'FORM') {
         const name = form_compare.elements['search'].value;
-        if (!villes.includes(name)) {
-            errtxt[1].style.display = 'block';
+        if (!(window.villes || []).includes(name)) {
+            window.errtxt[1].style.display = 'block';
             return;
         }
 
-        errtxt[1].style.display = 'none';
+        window.errtxt[1].style.display = 'none';
         selectedComparison = name;
         const datasetIndex = chart.data.datasets.findIndex(dataset => dataset.class == 'single');
         if (datasetIndex > 0) chart.data.datasets.splice(datasetIndex, 1);
@@ -351,7 +353,7 @@ function refreshDashboardTab(tabId = getActiveTabId()) {
                 }
             });
 
-            if (selectedComparison && villes.includes(selectedComparison)) {
+            if (selectedComparison && (window.villes || []).includes(selectedComparison)) {
                 pushDataSet(getLabelAndData(selectedComparison, dashboardData, [feature]), chart, theme, false);
             }
             chart.update();
@@ -369,26 +371,33 @@ function refreshDashboardTab(tabId = getActiveTabId()) {
 window.refreshDashboardTab = refreshDashboardTab;
 
 //Promesse : fetch sur les données indicateurs de chaque centre ville
-fetch('/data')
-.then(res => res.json())
-.then(json => {
+Promise.all([
+    fetch('/data').then(res => {
+        if (!res.ok) throw new Error('Unable to load dashboard data');
+        return res.json();
+    }),
+    window.webmappingReady,
+    window.cityListReady,
+])
+.then(([json]) => {
     dashboardData = json;
 
     form.addEventListener('submit', e => {
-        if (!check_cv.checked) {
-            check_cv.checked = true;
-            check_cv.dispatchEvent(new Event('change'));
+        if (!window.check_cv.checked) {
+            window.check_cv.checked = true;
+            window.check_cv.dispatchEvent(new Event('change'));
         }
 
-        const commune = geolocalisation(e);
+        const commune = window.geolocalisation(e);
         if (commune === 'non') return;
 
         selectedCommune = commune;
-        updateMapTitleAndAgeProfile(selectedCommune, dashboardData);
+        window.updateMapTitleAndAgeProfile(selectedCommune, dashboardData);
         refreshDashboardTab(getActiveTabId());
     });
 
     checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('click', checkCheckboxLimits);
         checkbox.addEventListener('change', e => {
             if (!selectedCommune) return;
             const activeTab = getActiveTabId();
@@ -409,4 +418,4 @@ fetch('/data')
         markTabCurrent(activeTab);
     });
 })
-.catch(error => console.error('Unable to load dashboard data:', error));
+.catch(error => console.error('Unable to initialize dashboard:', error));

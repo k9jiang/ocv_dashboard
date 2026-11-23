@@ -1,14 +1,5 @@
 var villes =[];
 
-//fetch('/villes')
-//.then(res => res.json())
-//.then(res2 => {
-//    for (ville of res2) {
-//        villes.push(ville.nom_com +' (' + ville.codgeo + ')');
-//    }
-//})
-
-
 fetch('/villes')
 .then(res => {
     if (!res.ok) {

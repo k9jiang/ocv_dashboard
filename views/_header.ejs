@@ -7,9 +7,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin=""/>
-    <script src="js/init_villes.js"></script>
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.19.0/dist/maplibre-gl.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js",
+                "maplibre-gl": "https://unpkg.com/maplibre-gl@6.19.0/dist/maplibre-gl.mjs",
+                "@maplibre/maplibre-gl-leaflet": "https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.1.4/dist/leaflet-maplibre-gl.mjs",
+                "@maplibre/maplibre-gl-leaflet/": "https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.1.4/"
+            }
+        }
+    </script>
+    <script>
+        window.webmappingReady = new Promise(resolve => {
+            window.addEventListener('webmapping-ready', resolve, { once: true });
+        });
+        window.cityListReady = fetch('/villes').then(response => {
+            if (!response.ok) throw new Error('Unable to load commune names');
+            return response.json();
+        }).then(cities => {
+            window.villes = cities.map(city => `${city.nom_com} (${city.codgeo})`);
+            return window.villes;
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
