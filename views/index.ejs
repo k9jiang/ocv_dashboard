@@ -1,12 +1,11 @@
 <%- include("_header") -%>
 <div id="left-pannel">
     <div id="options-left">
-        <form autocomplete = "off">
+        <form id="map-search-form" class="city-search-form" autocomplete="off">
             <div class="input-button">
-                <input type="text" id="input-map" placeholder = "Rechercher parmi les 3056 communes retenues..." name="search" >
-                <input type="submit" name ="envoi" value="OK">
+                <input type="text" id="input-map" placeholder="Rechercher parmi les 3056 communes retenues..." name="search" enterkeyhint="search" aria-controls="list-map" aria-expanded="false" aria-autocomplete="list">
             </div>
-            <ul class="list"></ul>
+            <ul class="list city-suggestions" id="list-map" role="listbox" aria-label="Suggestions de communes" hidden></ul>
         </form>
         <div id="affiche-centre">
             <input type="checkbox" name="centres" id="check-cv">
@@ -47,12 +46,11 @@
         </div>
         <div class="line sin">
             <p> Comparer avec un autre centre-ville : </p>
-            <form autocomplete = "off" id='compare-form'>
+            <form autocomplete="off" id="compare-form" class="city-search-form">
                 <div class="input-button">
-                    <input type="text" id="compare" placeholder = "Rechercher parmi les 3056 communes retenues..." name="search">
-                    <input type="submit" name ="envoi" value="OK">
+                    <input type="text" id="compare" placeholder="Rechercher parmi les 3056 communes retenues..." name="search" enterkeyhint="search" aria-controls="list-compare" aria-expanded="false" aria-autocomplete="list">
                 </div>
-                <ul class="list-compare"></ul>
+                <ul class="list-compare city-suggestions" id="list-compare" role="listbox" aria-label="Suggestions de communes à comparer" hidden></ul>
             </form>
             <p class="err-text right">Veuillez entrer une valeur dans la liste</p>
         </div>

@@ -86,85 +86,56 @@ dl.addEventListener('click', (e) =>{
     window.location.href='/dl-data';
 })
 
-input_compare.addEventListener("keyup", (e) => {
-    items = document.querySelectorAll(".list-item-compare");
-    remove_elements(items)
-    for (let ville of villes) {
-        //autocompletion
-        if (is_part_of(input_compare.value, ville) && input_compare.value != ""){
-            let list_item = document.createElement("li");
-            list_item.classList.add("list-item-compare");
-            list_item.style.cursor = "pointer";
-            list_item.setAttribute("onclick", "display_names(`"+ville+"`, 'compare')"); //backticks here and not apostrophes because of cities that contain one
-            let match_index = ville.toLowerCase().indexOf(input_compare.value.toLowerCase());
-            let item = `${ville.substr(0,match_index)}<b>${ville.substr(match_index, input_compare.value.length)}</b>${ville.substr(match_index+input_compare.value.length)}`;
-            list_item.innerHTML = item;
-            document.querySelector('.list-compare').appendChild(list_item);
-        }
-    }
+input_compare.addEventListener('input', () => renderCitySuggestions(input_compare, list_compare, 'list-item-compare'));
+input_compare.addEventListener('focus', () => renderCitySuggestions(input_compare, list_compare, 'list-item-compare'));
+list_compare.addEventListener('mousedown', event => event.preventDefault());
+input_compare.addEventListener('blur', () => {
+    window.setTimeout(() => {
+        list_compare.hidden = true;
+        input_compare.setAttribute('aria-expanded', 'false');
+    }, 120);
 });
 
-//Fonction qui vérifie si le canva d'un graphique est vide
-function isCanvasEmpty(canvas) {
-    let context = canvas.getContext('2d');
-    let pixelBuffer = new Uint32Array(
-    context.getImageData(0, 0, canvas.width, canvas.height).data.buffer);
-    //console.log(!pixelBuffer.some(color => color !== 0));
-    return !pixelBuffer.some(color => color !== 0);
-}
+function create_graph(json, search, chart_id, thematique){
+    const canvas = document.getElementById(chart_id);
+    const feature = json.find(obj => obj.codgeo == search);
+    if (!canvas || !feature) return null;
 
-function create_graph(json, search, is_submitted, chart_id, thematique){
-    var cnv = document.getElementById(chart_id);
-    let feature = json.filter(obj => obj.codgeo == search);
-    let name_label = feature[0].nom_com;
-    let data = indicateurs[thematique].map((indicateur) => feature[0][indicateur]);
-    let labels = indicateurs[thematique].map((indicateur) => nom_indicateurs[indicateur]);
-    let type = type_graph[thematique];
-    let scales = options_graph[thematique];
-    let bd_col = ['#FF7F00'];
-    let bg_col;
-    let borderWidth = 3;
-    let indexAxis = 'x';
-    //S'il y a déjà eu une création de graphique, détruire le graphique
-    if (is_submitted) {
-        let chartToDestroy = Chart.getChart(chart_id);
-        chartToDestroy.destroy();
-    }
-    //Les graphiques en radar ont une opacité réduite pour la superposition
-    if (type ==='radar'){
-        bg_col = [`rgba(${hexToRgb(bd_col[0])}, 0.15)`];
-    }
-    else {
-        bg_col = [`rgba(${hexToRgb(bd_col[0])}, 0.8)`];
-    }
-    if (thematique === 'slmen'){
-        indexAxis = 'y';
-    }
-    let chart = new Chart(cnv, {
+    const existingChart = Chart.getChart(canvas);
+    if (existingChart) existingChart.destroy();
+
+    const data = indicateurs[thematique].map(indicateur => feature[indicateur]);
+    const labels = indicateurs[thematique].map(indicateur => nom_indicateurs[indicateur]);
+    const type = type_graph[thematique];
+    const borderColor = '#FF7F00';
+    const backgroundColor = type === 'radar'
+        ? `rgba(${hexToRgb(borderColor)}, 0.15)`
+        : `rgba(${hexToRgb(borderColor)}, 0.8)`;
+
+    return new Chart(canvas, {
         type: type,
         data: {
-          labels : labels,
-          datasets: [{
-            label: name_label,
-            data: data,
-            backgroundColor: bg_col,
-            borderColor: bd_col,
-            borderWidth: borderWidth,
-          }]
+            labels: labels,
+            datasets: [{
+                label: feature.nom_com,
+                data: data,
+                backgroundColor: backgroundColor,
+                borderColor: borderColor,
+                borderWidth: 3,
+            }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: scales,
-            indexAxis: indexAxis,
+            scales: options_graph[thematique],
+            indexAxis: thematique === 'slmen' ? 'y' : 'x',
         }
     });
-    return chart;
 }
 
 function calculateMedian(jsonData, attribute) {
-    // Trier les éléments du JSON en fonction de la valeur de l'attribut
-    let sortedData = jsonData.sort((a, b) => a[attribute] - b[attribute]);
+    // Sort a copy so calculations never mutate the shared dataset.
+    let sortedData = [...jsonData].sort((a, b) => a[attribute] - b[attribute]);
     let count = sortedData.length;
     let middleIndex = Math.floor(count / 2);
     let median;
@@ -210,10 +181,14 @@ function hexToRgb(hex) {
 
 //Fonction retournant les propriété de style pour chart.js
 function getLabelAndData(name, json, feature) {
+    let data;
+    let label;
     let bg_col;
     // classtype permettra ensuite de réaliser des opérations selon la propriété "class" des datasets
     // ici : 'multiple' sera pour les datasets issus de plusieurs communes et 'single' pour une seule.
     let classtype = 'multiple';
+    if (!feature.length) return [[], '', '#18F0C8', classtype];
+
     if (name == 'france'){
         data = json;
         label = 'Médiane nationale';
@@ -222,7 +197,8 @@ function getLabelAndData(name, json, feature) {
     else if (name == 'region'){
         data = json.filter(obj => obj.region == feature[0].region);
         label = 'Médiane régionale';
-        bg_col = '#8A0D1E';    }
+        bg_col = '#8A0D1E';
+    }
     else if (name == 'departement'){
         data = json.filter(obj => obj.codgeo.substring(0,2) == feature[0].codgeo.substring(0,2));
         label = 'Médiane départementale';
@@ -235,7 +211,7 @@ function getLabelAndData(name, json, feature) {
     }
     //Tous les autres cas, c-a-d lorsqu'on compare avec un autre centre-ville
     else {
-        codgeo = name.substring(name.length -6, name.length-1)
+        const codgeo = name.substring(name.length -6, name.length-1);
         data = json.filter(obj => obj.codgeo == codgeo);
         label = name.substring(0, name.length - 8);
         bg_col = '#18F0C8';
@@ -245,164 +221,192 @@ function getLabelAndData(name, json, feature) {
 }
 
 //Fonction permettant d'ajouter le dataset au chart 
-function pushDataSet(data_label, chart, thematique){
-    let data = data_label[0];
-    let label = data_label[1];
-    let bd_col = data_label[2];
-    let bg_col;
-    let classtype = data_label[3];
-    let variables = indicateurs[thematique].map((indicateur) => calculateMedian(data, indicateur));
+function pushDataSet(data_label, chart, thematique, update = true){
+    const data = data_label[0];
+    const label = data_label[1];
+    let borderColor = data_label[2];
+    let backgroundColor;
+    const classtype = data_label[3];
+    if (!chart || !data.length) return;
+
+    const variables = indicateurs[thematique].map(indicateur => calculateMedian(data, indicateur));
     if (type_graph[thematique] === 'radar'){
-        bg_col = `rgba(${hexToRgb(bd_col)}, 0.2)`;
+        backgroundColor = `rgba(${hexToRgb(borderColor)}, 0.2)`;
     }
     else {
-        bg_col = `rgba(${hexToRgb(bd_col)}, 0.8)`;
+        backgroundColor = `rgba(${hexToRgb(borderColor)}, 0.8)`;
     }
     if (type_graph[thematique] === 'doughnut'){
-        variables = [variables, 100-variables];
-        bg_col = [bd_col, 'rgba(204,204,204,1)'];
-        bd_col = 'rgba(255,255,255,1)';
-        borderWidth = 1
+        backgroundColor = [borderColor, 'rgba(204,204,204,1)'];
+        borderColor = 'rgba(255,255,255,1)';
     }
-    newDataset = {
+    chart.data.datasets.push({
         class: classtype,
         label: label,
-        data : variables,
+        data: variables,
         borderWidth: 1,
-        backgroundColor: bg_col,
-        borderColor: bd_col,
-    };
-    chart.data.datasets.push(newDataset);
-    chart.update();
+        backgroundColor: backgroundColor,
+        borderColor: borderColor,
+    });
+    if (update) chart.update();
 }
 
 //Fonction pour "rafraîchir" les datasets lorsqu'une comparaison est faite
 function refreshDataSets(e, json, search, chart_id) {
-    var ctx = document.getElementById(chart_id);
-    let chart = Chart.getChart(ctx);
-    let feature = json.filter(obj => obj.codgeo == search);
-    let thematique = chart_id.substr(6);
-    // Si un checkbox est coché ou décoché...
+    const chart = Chart.getChart(chart_id);
+    if (!chart) return;
+    const feature = json.filter(obj => obj.codgeo == search);
+    const thematique = chart_id.substring(6);
+
     if (e.type === 'change' && e.target.type === 'checkbox') {
-        let data_label = getLabelAndData(e.target.name, json, feature);
-        // S'il est coché, alors on y ajoute le dataset obtenu par la fonction pushDataSet
+        const data_label = getLabelAndData(e.target.name, json, feature);
         if (e.target.checked) {
             pushDataSet(data_label, chart, thematique);
-        }
-        // Si non, on enlève le dataset en question grâce à son index
-        else {
-            let label = data_label[1];
-            let datasetIndexToRemove = chart.data.datasets.findIndex(dataset => dataset.label == label);
-            if (datasetIndexToRemove > 0) {
-                chart.data.datasets.splice(datasetIndexToRemove, 1);
+        } else {
+            const datasetIndex = chart.data.datasets.findIndex(dataset => dataset.label == data_label[1]);
+            if (datasetIndex > 0) {
+                chart.data.datasets.splice(datasetIndex, 1);
                 chart.update();
             }
         }
-    }
-    // Si non, (comparaison avec une commune)
-    else if (e.type === 'submit' && e.target.tagName === 'FORM') {
-        e.preventDefault();
-        let name = form_compare.elements["search"].value;
-        if (!villes.includes(name)){
+    } else if (e.type === 'submit' && e.target.tagName === 'FORM') {
+        const name = form_compare.elements['search'].value;
+        if (!villes.includes(name)) {
             errtxt[1].style.display = 'block';
+            return;
         }
-        else{
-            errtxt[1].style.display = 'none';
-            let datasetIndexToRemove = chart.data.datasets.findIndex(dataset => dataset.class == 'single');
-            //Si l'index n'existe pas il sera égal à -1, alors s'il est >0, on supprime le dataset précédent
-            if (datasetIndexToRemove > 0) {
-                chart.data.datasets.splice(datasetIndexToRemove, 1);
-                chart.update();}
-            //On ajoute au chart le dataset obtenu
-            let data_label = getLabelAndData(form_compare.elements["search"].value, json, feature);
-            pushDataSet(data_label, chart, thematique);
-        }
+
+        errtxt[1].style.display = 'none';
+        selectedComparison = name;
+        const datasetIndex = chart.data.datasets.findIndex(dataset => dataset.class == 'single');
+        if (datasetIndex > 0) chart.data.datasets.splice(datasetIndex, 1);
+
+        const data_label = getLabelAndData(name, json, feature);
+        pushDataSet(data_label, chart, thematique);
     }
 }
 
-//Promesse : fetch sur les données indicateurs de chaque centre ville
-fetch('/data')
-.then(function(res){
-    return res.json();
-})
-.then(function(json){
-    let is_submitted = false;
-    data_json = json;
-    form.addEventListener('submit', (e) => {
-        //Si l'affichage des périmètres de centre villes est désactivé lors de la recherche de commune
-        if (!check_cv.checked){
-            //Créer "artficiellement" un évenement "change" et cocher la checkbox
-            check_cv.checked = true;
-            check_cv.dispatchEvent(new Event ('change'));
-        }
-        //Utiliser de la fonction geolocalisation pour zoomer sur la commune et récuperer le code insee
-        search = geolocalisation(e);
-        //Mettre à jour le titre de la carte
-        if (search != 'non'){
-            updateMapTitleAndAgeProfile(search, data_json);
-            //Création des graphiques
-            let chart_sdi = create_graph(data_json, search, is_submitted, 'chart_sdi', 'sdi');
-            let chart_aec = create_graph(data_json, search, is_submitted, 'chart_aec', 'aec');
-            let chart_sl1 = create_graph(data_json, search, is_submitted, 'chart_sl1', 'sl1');
-            let chart_sl34 = create_graph(data_json, search, is_submitted, 'chart_sl34', 'sl34');
-            let chart_slmen = create_graph(data_json, search, is_submitted, 'chart_slmen', 'slmen');
-            let chart_sda1 = create_graph(data_json, search, is_submitted, 'chart_sda1', 'sda1');
-            let chart_sda2 = create_graph(data_json, search, is_submitted, 'chart_sda2', 'sda2');
-            let chart_es1 = create_graph(data_json, search, is_submitted, 'chart_es1', 'es1');
-            let chart_es2 = create_graph(data_json, search, is_submitted, 'chart_es2', 'es2');
-            let chart_ti13 = create_graph(data_json, search, is_submitted, 'chart_ti13', 'ti13');
-            let chart_ti4 = create_graph(data_json, search, is_submitted, 'chart_ti4', 'ti4');
-            is_submitted = true;
-            for (let i = 0; i< checkboxes.length; i++){
-                if (checkboxes[i].checked) {
-                    let feature = json.filter(obj => obj.codgeo == search);
-                    label_data = getLabelAndData(checkboxes[i].name, json, feature);
-                    pushDataSet(label_data, chart_sdi, 'sdi');
-                    pushDataSet(label_data, chart_aec, 'aec');
-                    pushDataSet(label_data, chart_sl1, 'sl1');
-                    pushDataSet(label_data, chart_sl34, 'sl34');
-                    pushDataSet(label_data, chart_sda1, 'sda1');
-                    pushDataSet(label_data, chart_sda2, 'sda2');
-                    pushDataSet(label_data, chart_es1, 'es1');
-                    pushDataSet(label_data, chart_es2, 'es2');
-                    pushDataSet(label_data, chart_ti13, 'ti13');
-                    pushDataSet(label_data, chart_slmen, 'slmen');
-                    pushDataSet(label_data, chart_ti4, 'ti4');
-                }
-            }
-        }
+const chartsByTab = {
+    sl: [['chart_sl1', 'sl1'], ['chart_sl34', 'sl34'], ['chart_slmen', 'slmen']],
+    aec: [['chart_aec', 'aec']],
+    sdi: [['chart_sdi', 'sdi']],
+    sda: [['chart_sda1', 'sda1'], ['chart_sda2', 'sda2']],
+    es: [['chart_es1', 'es1'], ['chart_es2', 'es2']],
+    ti: [['chart_ti13', 'ti13'], ['chart_ti4', 'ti4']],
+};
+
+let dashboardData = null;
+let selectedCommune = null;
+let selectedComparison = null;
+const chartCommunes = new Map();
+
+function getActiveTabId() {
+    return document.querySelector('.tab-content[style*="display: block"]')?.id
+        || document.querySelector('.tab-content.active')?.id
+        || 'sl';
+}
+
+function getDashboardStateSignature() {
+    return JSON.stringify({
+        commune: selectedCommune,
+        comparisons: Array.from(checkboxes).filter(checkbox => checkbox.checked)
+            .map(checkbox => checkbox.name).sort(),
+        single: selectedComparison,
     });
-    for (let i = 0; i < checkboxes.length; i++) {
-        checkboxes[i].addEventListener('change', (e) => {
-            if (is_submitted) {
-                refreshDataSets(e, json, search, 'chart_sdi');
-                refreshDataSets(e, json, search, 'chart_aec');
-                refreshDataSets(e, json, search, 'chart_sl1');
-                refreshDataSets(e, json, search, 'chart_sl34');
-                refreshDataSets(e, json, search, 'chart_slmen');
-                refreshDataSets(e, json, search, 'chart_sda1');
-                refreshDataSets(e, json, search, 'chart_sda2');
-                refreshDataSets(e, json, search, 'chart_es1');
-                refreshDataSets(e, json, search, 'chart_es2');
-                refreshDataSets(e, json, search, 'chart_ti13');
-                refreshDataSets(e, json, search, 'chart_ti4');
+}
+
+function markTabCurrent(tabId = getActiveTabId()) {
+    if (!chartsByTab[tabId]) return;
+    const signature = getDashboardStateSignature();
+    chartsByTab[tabId].forEach(([chartId]) => {
+        if (Chart.getChart(chartId)) chartCommunes.set(chartId, signature);
+    });
+}
+
+function refreshDashboardTab(tabId = getActiveTabId()) {
+    if (!dashboardData || !selectedCommune || !chartsByTab[tabId]) return;
+
+    const feature = dashboardData.find(item => item.codgeo == selectedCommune);
+    if (!feature) return;
+
+    const tabCharts = chartsByTab[tabId];
+    const signature = getDashboardStateSignature();
+    const needsRebuild = tabCharts.some(([chartId]) =>
+        chartCommunes.get(chartId) !== signature || !Chart.getChart(chartId)
+    );
+
+    if (needsRebuild) {
+        const createdCharts = tabCharts.map(([chartId, theme]) =>
+            create_graph(dashboardData, selectedCommune, chartId, theme)
+        );
+
+        createdCharts.forEach((chart, index) => {
+            if (!chart) return;
+            const theme = tabCharts[index][1];
+            chartCommunes.set(tabCharts[index][0], signature);
+
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    pushDataSet(getLabelAndData(checkbox.name, dashboardData, [feature]), chart, theme, false);
+                }
+            });
+
+            if (selectedComparison && villes.includes(selectedComparison)) {
+                pushDataSet(getLabelAndData(selectedComparison, dashboardData, [feature]), chart, theme, false);
             }
+            chart.update();
+        });
+    } else {
+        // The comparison interaction only updates charts currently visible in the active tab.
+        tabCharts.forEach(([chartId]) => {
+            const chart = Chart.getChart(chartId);
+            if (chart) chart.resize();
         });
     }
-    form_compare.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if(is_submitted){
-            refreshDataSets(e, json, search, 'chart_sdi');
-            refreshDataSets(e, json, search, 'chart_aec');
-            refreshDataSets(e, json, search, 'chart_sl1');
-            refreshDataSets(e, json, search, 'chart_sl34');
-            refreshDataSets(e, json, search, 'chart_slmen');
-            refreshDataSets(e, json, search, 'chart_sda1');
-            refreshDataSets(e, json, search, 'chart_sda2');
-            refreshDataSets(e, json, search, 'chart_es1');
-            refreshDataSets(e, json, search, 'chart_es2');
-            refreshDataSets(e, json, search, 'chart_ti13');
-            refreshDataSets(e, json, search, 'chart_ti4');
+}
+
+// Used by openTab in script_webmapping.js after switching the visible tab.
+window.refreshDashboardTab = refreshDashboardTab;
+
+//Promesse : fetch sur les données indicateurs de chaque centre ville
+fetch('/data')
+.then(res => res.json())
+.then(json => {
+    dashboardData = json;
+
+    form.addEventListener('submit', e => {
+        if (!check_cv.checked) {
+            check_cv.checked = true;
+            check_cv.dispatchEvent(new Event('change'));
         }
-    })
+
+        const commune = geolocalisation(e);
+        if (commune === 'non') return;
+
+        selectedCommune = commune;
+        updateMapTitleAndAgeProfile(selectedCommune, dashboardData);
+        refreshDashboardTab(getActiveTabId());
+    });
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', e => {
+            if (!selectedCommune) return;
+            const activeTab = getActiveTabId();
+            chartsByTab[activeTab].forEach(([chartId]) =>
+                refreshDataSets(e, dashboardData, selectedCommune, chartId)
+            );
+            markTabCurrent(activeTab);
+        });
+    });
+
+    form_compare.addEventListener('submit', e => {
+        e.preventDefault();
+        if (!selectedCommune) return;
+        const activeTab = getActiveTabId();
+        chartsByTab[activeTab].forEach(([chartId]) =>
+            refreshDataSets(e, dashboardData, selectedCommune, chartId)
+        );
+        markTabCurrent(activeTab);
+    });
 })
+.catch(error => console.error('Unable to load dashboard data:', error));

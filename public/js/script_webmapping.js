@@ -57,61 +57,69 @@ let geom_style = {
         color: "#000"},
 }
 
-//A chaque fois que le contenu de la barre de recherche change
-input.addEventListener("keyup", (e) => {
-    items = document.querySelectorAll(".list-item");
-    remove_elements(items)
-    for (let ville of villes) {
-        //autocompletion
-        if (is_part_of(input.value, ville) && input.value != ""){
-            let list_item = document.createElement("li");
-            list_item.classList.add("list-item");
-            list_item.style.cursor = "pointer";
-            list_item.setAttribute("onclick", "display_names(`"+ville+"`, input)"); //backticks here and not apostrophes because of cities that contain one
-            let match_index = ville.toLowerCase().indexOf(input.value.toLowerCase());
-            let item = `${ville.substr(0,match_index)}<b>${ville.substr(match_index, input.value.length)}</b>${ville.substr(match_index+input.value.length)}`;
-            list_item.innerHTML = item;
-            document.querySelector(".list").appendChild(list_item);
-        }
-    }
-    set_border();
-});
-
-list.addEventListener("click", (e) => {
-    set_border();
-})
-
+// Autocomplete is shared by the map search and comparison search fields.
 function is_part_of(chaine_recherchee, chaine_a_verifier) {
-    chaine_recherchee = chaine_recherchee.toLowerCase();
-    chaine_a_verifier = chaine_a_verifier.toLowerCase();
-    return chaine_a_verifier.indexOf(chaine_recherchee) !== -1;
+    return chaine_a_verifier.toLocaleLowerCase().includes(chaine_recherchee.toLocaleLowerCase());
 }
 
-function display_names(value, input){
-    if (input != 'compare'){
-        items = document.querySelectorAll(".list-item");
-        input.value = value;}
-    else {
-        input_compare.value = value;
-        items = document.querySelectorAll(".list-item-compare");
-    };
-    remove_elements(items);
-}
 function remove_elements(items){
-    items.forEach((item) => {
-        item.remove();
-    });
+    items.forEach(item => item.remove());
 }
 
-function set_border(){
-    items = document.querySelectorAll(".list-item");
-    if (items.length>0) {
-        list.style.border = "1px solid";
-    }
-    else{
-        list.style.border ="";
-    }
+function renderCitySuggestions(searchInput, suggestionsList, itemClass) {
+    remove_elements(suggestionsList.querySelectorAll('li'));
+    const query = searchInput.value.trim();
+    const matches = (query ? villes.filter(ville => is_part_of(query, ville)) : villes).slice(0, 30);
+    matches.forEach(ville => {
+        const item = document.createElement('li');
+        item.className = itemClass;
+        item.setAttribute('role', 'option');
+        item.setAttribute('tabindex', '0');
+
+        const matchIndex = ville.toLocaleLowerCase().indexOf(query.toLocaleLowerCase());
+        item.append(document.createTextNode(ville.slice(0, matchIndex)));
+        const match = document.createElement('b');
+        match.textContent = ville.slice(matchIndex, matchIndex + query.length);
+        item.append(match, document.createTextNode(ville.slice(matchIndex + query.length)));
+
+        const selectCity = () => {
+            searchInput.value = ville;
+            suggestionsList.hidden = true;
+            searchInput.setAttribute('aria-expanded', 'false');
+            searchInput.focus();
+            searchInput.closest('form')?.requestSubmit();
+        };
+        item.addEventListener('click', selectCity);
+        item.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                selectCity();
+            }
+        });
+        suggestionsList.appendChild(item);
+    });
+
+    suggestionsList.hidden = matches.length === 0;
+    searchInput.setAttribute('aria-expanded', String(matches.length > 0));
 }
+
+function display_names(value, target){
+    const searchInput = target === 'compare' ? input_compare : input;
+    const suggestionsList = target === 'compare' ? list_compare : list;
+    searchInput.value = value;
+    suggestionsList.hidden = true;
+    searchInput.setAttribute('aria-expanded', 'false');
+}
+
+input.addEventListener('input', () => renderCitySuggestions(input, list, 'list-item'));
+input.addEventListener('focus', () => renderCitySuggestions(input, list, 'list-item'));
+list.addEventListener('mousedown', event => event.preventDefault());
+input.addEventListener('blur', () => {
+    window.setTimeout(() => {
+        list.hidden = true;
+        input.setAttribute('aria-expanded', 'false');
+    }, 120);
+});
 
 function geolocalisation(event){
     event.preventDefault();
@@ -232,6 +240,7 @@ function openTab(evt, tabName) {
     const tabContent = document.getElementsByClassName('tab-content');
     for (let i = 0; i < tabContent.length; i++) {
       tabContent[i].style.display = 'none';
+      tabContent[i].classList.remove('active');
     }
   
     // Récupère tous les éléments avec la classe "tab-button" et retire la classe "active"
@@ -240,9 +249,16 @@ function openTab(evt, tabName) {
       tabButton[i].classList.remove('active');
     }
   
-    // Affiche le contenu de l'onglet sélectionné et ajoute la classe "active" au bouton correspondant
-    document.getElementById(tabName).style.display = 'block';
+    // Affiche le contenu de l'onglet sélectionné et maintient son état actif en classe.
+    const activeContent = document.getElementById(tabName);
+    activeContent.style.display = 'block';
+    activeContent.classList.add('active');
     evt.currentTarget.classList.add('active');
+
+    // Construire/redimensionner uniquement les graphiques de l'onglet visible.
+    if (typeof window.refreshDashboardTab === 'function') {
+      window.refreshDashboardTab(tabName);
+    }
   }
 
 // Récupérer toutes les cases à cocher

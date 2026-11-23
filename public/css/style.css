@@ -1,12 +1,14 @@
 @import url(https://fonts.bunny.net/css);
 * {
+    box-sizing: border-box;
     font-family: 'Alata', sans-serif;
 }
 
 body {
-    margin: auto;
-    height: 100vh;
-    width: 100vw;
+    margin: 0;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 header div{
@@ -60,33 +62,58 @@ header img {
     height: 3%;
 }
 
+.city-search-form {
+    position: relative;
+    width: min(100%, 440px);
+    min-width: 0;
+    z-index: 5;
+}
+
+.city-search-form input[type="text"] {
+    width: 100%;
+}
+
 .input-button{
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    width: 100%;
+    min-width: 0;
     margin-left: 10px;
 }
 
+.city-search-form .input-button {
+    margin-left: 0;
+}
+
+#map-search-form {
+    margin-left: 10px;
+}
+
+#map-search-form .input-button {
+    width: calc(100% - 10px);
+}
+
 input[type="text"] {
-    width: 21vw;
-    border : 2px solid black;
-    padding : 10px 10px;
+    width: 100%;
+    min-width: 0;
+    border: 2px solid black;
+    padding: 10px 12px;
     border-radius: 2rem;
     background-color: white;
-    font-size : 0.8em;
+    font-size: 16px;
 }
 
 input[type="submit"] {
-    padding : 5px 5px;
-    border-radius : 2rem;
-    border : 2px solid black;
-    width : 45px;
-    margin-left:-50px;
+    padding: 5px;
+    border-radius: 2rem;
+    border: 2px solid black;
+    width: 45px;
+    margin-left: -50px;
 }
 
 input[type="submit"]:hover {
     background-color: rgb(207, 207, 207);
-    cursor:pointer;
+    cursor: pointer;
 }
 
 .line{
@@ -122,32 +149,37 @@ input[type="submit"]:hover {
     flex-wrap: nowrap;
 }
 
-ul{
-    list-style : none;
-    padding: 0;
-    position:absolute;
-    top: 125px;
-    z-index:2;
+.city-suggestions {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 20;
+    width: 100%;
+    max-height: min(40vh, 280px);
+    margin: 0;
+    padding: 4px;
+    overflow-y: auto;
+    list-style: none;
+    background: #fff;
+    border: 1px solid #aaa;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgb(0 0 0 / 18%);
 }
 
-.list, .list-compare{
-    width: 350px;
-    max-height : 75px;
-    background-color: white;
-    margin : 0 0 0 25px;
-    overflow-y:scroll;
-}
-
-.list-compare{
-    margin-top: 35px;
+.city-suggestions[hidden] {
+    display: none;
 }
 
 .list-item, .list-item-compare {
-    padding : 3.5px 10px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    cursor: pointer;
 }
 
-.list-item:hover {
-    background-color: rgb(187, 187, 187);
+.list-item:hover, .list-item-compare:hover,
+.list-item:focus, .list-item-compare:focus {
+    background-color: rgb(235, 229, 240);
+    outline: none;
 }
 
 #map{
@@ -480,10 +512,6 @@ ul{
         justify-content: space-between;
     }
 
-    #options-left form .input-button input[type="text"]{
-        width: 40vw;
-    }
-
     #vertical-line{
         width:0px;
         height:0px;
@@ -506,9 +534,6 @@ ul{
         border-left: 1px solid black;
     }
 
-    #compare-form .input-button input[type="text"]{
-        width: 40vw;
-    }
 }
 
 @media (width < 870px){
@@ -546,5 +571,337 @@ ul{
     }
     .tab-button:nth-child(5){
         border-left: 1px solid black;
+    }
+}
+
+/* Responsive layout refinements */
+.container,
+#left-pannel,
+#right-pannel,
+#dashboard,
+.tab-content {
+    min-width: 0;
+}
+
+#dashboard {
+    overflow: hidden;
+}
+
+.chart-containers-container {
+    min-width: 0;
+}
+
+canvas {
+    max-width: 100%;
+}
+
+@media (width < 1100px) {
+    .container {
+        gap: 12px;
+    }
+
+    #left-pannel,
+    #right-pannel {
+        width: auto;
+        height: auto;
+        margin: 0 12px;
+    }
+
+    #left-pannel {
+        min-height: 0;
+    }
+
+    #map {
+        width: 100%;
+        height: clamp(320px, 55vh, 620px);
+        margin: 8px 0 0;
+        flex: none;
+    }
+
+    #text-container {
+        height: auto;
+        min-height: 0;
+        margin-left: 0;
+    }
+
+    #options-left {
+        height: auto;
+        min-height: 54px;
+        gap: 12px;
+    }
+
+    #options-left form,
+    #options-left .input-button {
+        min-width: 0;
+        flex: 1;
+    }
+
+    #map-search-form {
+        margin-left: 0;
+    }
+
+    #map-search-form .input-button {
+        width: 100%;
+    }
+
+    #options-left form .input-button input[type="text"],
+    #compare-form .input-button input[type="text"] {
+        width: 100%;
+        min-width: 0;
+    }
+
+    #options-right {
+        height: auto;
+        padding: 12px;
+        gap: 8px;
+    }
+
+    .line {
+        flex-wrap: wrap;
+        gap: 8px 14px;
+    }
+
+    .line p {
+        margin: 4px 0;
+    }
+
+    .param {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+    }
+
+    .line.sin {
+        align-items: center;
+    }
+
+    #compare-form {
+        flex: 1 1 280px;
+        min-width: 0;
+    }
+
+    #compare-form .input-button {
+        margin-left: 0;
+    }
+
+    #dashboard {
+        height: auto;
+        margin: 8px 0;
+    }
+
+    .chart-containers-container {
+        height: clamp(360px, 58vw, 550px);
+    }
+
+    .tab-button {
+        min-width: 0;
+        flex: 1 1 155px;
+    }
+
+    .tab-button:nth-child(n) {
+        border-radius: 0;
+        border-left: 1px solid black;
+    }
+
+    .tab-button:nth-child(1) {
+        border-top-left-radius: 15px;
+        border-left: 0;
+    }
+
+    .tab-button:last-child {
+        border-top-right-radius: 15px;
+    }
+
+    .city-search-form {
+        width: 100%;
+    }
+
+    .city-suggestions {
+        max-width: 100%;
+    }
+}
+
+@media (width < 600px) {
+    header div {
+        min-height: 58px;
+        height: auto;
+        padding: 6px 10px;
+    }
+
+    header a h1 {
+        margin: 0;
+        font-size: clamp(1.2rem, 5vw, 1.7rem);
+    }
+
+    header img {
+        height: 42px;
+        max-width: 30vw;
+        object-fit: contain;
+        margin: 0;
+    }
+
+    #left-pannel,
+    #right-pannel {
+        margin: 0 8px;
+    }
+
+    #options-left {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px 0;
+    }
+
+    #options-left form,
+    #options-left form .input-button {
+        width: 100%;
+    }
+
+    #affiche-centre {
+        margin: 0;
+    }
+
+    input[type="text"] {
+        padding: 10px 48px 10px 12px;
+        font-size: 16px;
+    }
+
+    .input-button {
+        min-width: 0;
+    }
+
+    #options-right {
+        padding: 10px;
+    }
+
+    .param {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .check-label {
+        align-items: flex-start;
+        white-space: normal;
+    }
+
+    .check-label input {
+        flex: 0 0 auto;
+        margin: 3px 5px 0 0;
+    }
+
+    .line.sin {
+        display: flex;
+        align-items: stretch;
+    }
+
+    #compare-form {
+        flex-basis: 100%;
+        width: 100%;
+    }
+
+    .err-text.right {
+        margin-left: 0;
+    }
+
+    .tabs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .tab-button {
+        min-height: 48px;
+        height: auto;
+        padding: 9px 6px;
+        font-size: 0.85rem;
+        line-height: 1.2;
+    }
+
+    .tab-button:nth-child(n) {
+        border-radius: 0;
+        border-left: 1px solid black;
+    }
+
+    .tab-button:nth-child(odd) {
+        border-left: 0;
+    }
+
+    .tab-button:nth-child(1) {
+        border-top-left-radius: 15px;
+    }
+
+    .tab-button:nth-child(2) {
+        border-top-right-radius: 15px;
+    }
+
+    .tab-content {
+        padding: 10px;
+    }
+
+    .chart-containers-container {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        height: auto;
+        min-height: 320px;
+        position: relative;
+    }
+
+    .chart-container,
+    .chart-container.sl1,
+    .chart-container.sl34,
+    .chart-container.slmen,
+    .chart-container.sda1,
+    .chart-container.sda2,
+    .chart-container.es1,
+    .chart-container.es2,
+    .chart-container.ti13,
+    .chart-container.ti4 {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: clamp(210px, 65vw, 300px);
+        flex: 0 0 auto;
+        align-self: auto;
+    }
+
+    #profil-age {
+        order: -1;
+        margin: 0;
+    }
+
+    .info-button {
+        z-index: 2;
+        top: 0;
+        right: 0;
+    }
+
+    .tooltip {
+        z-index: 3;
+        position: absolute;
+        inset: 28px 0 auto;
+        max-height: min(70vh, 480px);
+        margin: 0;
+        padding: 8px 12px;
+        overflow: auto;
+    }
+
+    .city-suggestions {
+        max-width: 100%;
+    }
+}
+
+@media (width < 380px) {
+    .param {
+        grid-template-columns: 1fr;
+    }
+
+    .tabs {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .tab-button {
+        font-size: 0.78rem;
     }
 }
